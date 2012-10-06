@@ -20,7 +20,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.viadee.deesceha.maven.doxia</groupId>
 	<artifactId>doxia-module-textile</artifactId>
-	<version>1.0.0.3-SNAPSHOT</version>
+	<version>1.0.0.3</version>
 	<packaging>jar</packaging>
 	<url>https://github.com/deesceha/doxia-module-textile</url>
 	<inceptionYear>2011</inceptionYear>
