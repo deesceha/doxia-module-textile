@@ -23,7 +23,9 @@
 package de.viadee.maven.doxia.modules.textile;
 
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.Reader;
+import java.io.StringReader;
 
 import org.apache.maven.doxia.parser.AbstractTextParser;
 import org.apache.maven.doxia.parser.ParseException;
@@ -45,6 +47,13 @@ import com.google.common.io.CharStreams;
  */
 public final class TextileParser extends AbstractTextParser {
 
+	public static final String META_PREFIX = "==<!--";
+	public static final String META_SUFFIX = "-->==";
+	public static final String AUTHOR_ATTRIBUTE = "author:";
+	public static final String TITLE_ATTRIBUTE  = "title:";
+	public static final String DATE_ATTRIBUTE   = "date:";
+	
+	
     /**
      * Constructor for a new Doxia Textile parser.
      */
@@ -82,7 +91,53 @@ public final class TextileParser extends AbstractTextParser {
             final String html = markupParser.parseToHtml(markupContent);
             this.getLog().info("HTML content is: \n" + html);
 
-            sink.rawText(html);
+            try {
+				LineNumberReader lnr = new LineNumberReader(new StringReader(markupContent));
+				String line = null;
+				
+				sink.head();
+				while ((line=lnr.readLine())!=null) 
+				{
+					if (line.startsWith(META_PREFIX) && line.endsWith(META_SUFFIX)) 
+					{
+						
+						String inBetween = line.substring(META_PREFIX.length(),line.length()-META_SUFFIX.length());
+						
+						if (inBetween.toLowerCase().startsWith(AUTHOR_ATTRIBUTE)) 
+						{
+							sink.author();
+							sink.rawText(inBetween.substring(AUTHOR_ATTRIBUTE.length()));
+							sink.author_();
+						}
+						
+						if (inBetween.toLowerCase().startsWith(TITLE_ATTRIBUTE)) 
+						{
+							System.out.println("set title to: "+inBetween.substring(TITLE_ATTRIBUTE.length()));
+							sink.title();
+							sink.rawText(inBetween.substring(TITLE_ATTRIBUTE.length()));
+							sink.title_();
+						}
+						
+						if (inBetween.toLowerCase().startsWith(DATE_ATTRIBUTE)) 
+						{
+							sink.date();
+							sink.rawText(inBetween.substring(DATE_ATTRIBUTE.length()));
+							sink.date_();
+						}
+						
+						
+					}
+					
+					
+				}
+				sink.head_();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+            
+            
+            sink.rawText(html);    
 
             sink.flush();
         }
